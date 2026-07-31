@@ -4,6 +4,11 @@ from flask import Flask, jsonify
 app = Flask(__name__)
 
 
+@app.route('/', methods=['GET'])
+def index():
+    return "hello from render"
+
+
 @app.route('/hello', methods=['GET'])
 def hello():
     return jsonify({"message": "hello from render"}), 200
