@@ -30,8 +30,8 @@ jobs:
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           passphrase: ${{ secrets.SSH_PASSPHRASE }}
           script: |
+            echo ${{ secrets.SSH_HOST }}
             cd /home/fbmerf3ynq50/python/render_app
-            echo "Testing by Mahesh" >> log.txt
             find . -type d -name __pycache__ -exec rm -rf {} + 2>/dev/null || true
             git pull origin master 2>&1 || true
             # Trigger restart via GoDaddy's Python manager (if needed)
