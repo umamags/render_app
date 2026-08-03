@@ -1,0 +1,37 @@
+name: Deploy to GoDaddy
+
+on:
+  push:
+    branches: [master]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Deploy via SFTP
+        uses: wlixcc/SFTP-Deploy-Action@v1.2.6
+        with:
+          server: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          port: ${{ secrets.SSH_PORT }}
+          ssh_private_key: ${{ secrets.SSH_PRIVATE_KEY }}
+          ssh_passphrase: ${{ secrets.SSH_PASSPHRASE }}
+          local_path: './*'
+          remote_path: '/home/fbmerf3ynq50/python/render_app'
+
+      - name: Restart Python App on GoDaddy
+        uses: appleboy/ssh-action@v1.0.0
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          port: ${{ secrets.SSH_PORT }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          passphrase: ${{ secrets.SSH_PASSPHRASE }}
+          script: |
+            cd /home/fbmerf3ynq50/python/render_app
+            find . -type d -name __pycache__ -exec rm -rf {} + 2>/dev/null || true
+            git pull origin master 2>&1 || true
+            # Trigger restart via GoDaddy's Python manager (if needed)
+            echo "Deployment complete - GoDaddy will auto-restart Python app"
